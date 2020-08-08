@@ -37,7 +37,7 @@ $ npm start
 
 - **`BAN_REASON`**:
 	Message to use for ban/timeout like "`Auto-deleted bad
-	text`". Detaults to "`Anti-art moderation bot`".
+	text`". Defaults to "`Anti-art moderation bot`".
 
 - **`TIMEOUT_SECONDS`**:
 	Number of seconds to use in the timeout. Used if `MOD_ACTION` is `timeout`.
