@@ -42,7 +42,7 @@ const ranges = [
 // TODO: Get from env (include/exlude)
 const rangePicks = [ 'braille', 'boxDrawing', 'block' ];
 
-const toUnicodeRegex = n => `\\u${n.toStrinh(16)}`;
+const toUnicodeRegex = n => `\\u${n.toString(16)}`;
 const regexRanges = ranges.filter(n => rangePicks.includes(n.name));
 const regexRangeText = regexRanges.map(({ range }) => range.map(r => {
 	if(Array.isArray(r)) {
