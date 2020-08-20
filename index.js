@@ -26,10 +26,34 @@ if(!envIsGood) {
 	process.exit();
 }
 
-const brailleRange = '\\u2800-\\u28FF';
-const _regexText = `[${brailleRange}]`;
-const _regexFlags = '';
-const regex = new RegExp(_regexText, _regexFlags);
+const ranges = [
+	{
+		name: 'boxDrawing',
+		range: [ [ 0x2500, 0x257F ] ]
+	},{
+		name: 'block',
+		range: [ [ 0x2580, 0x259F ] ]
+	},{
+		name: 'braille',
+		range: [ [ 0x2800, 0x28FF ] ]
+	}
+];
+
+// TODO: Get from env (include/exlude)
+const rangePicks = [ 'braille', 'boxDrawing', 'block' ];
+
+const toUnicodeRegex = n => `\\u${n.toStrinh(16)}`;
+const regexRanges = ranges.filter(n => rangePicks.includes(n.name));
+const regexRangeText = regexRanges.map(({ range }) => range.map(r => {
+	if(Array.isArray(r)) {
+		return r.map(toUnicodeRegex).join('-');
+	}
+	return toUnicodeRegex(r);
+}).join(''));
+const regexText = `[${regexRangeText.join('')}]`;
+const regexFlags = '';
+
+const regex = new RegExp(regexText, regexFlags);
 
 console.log({ regex });
 
