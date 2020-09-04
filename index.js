@@ -7,7 +7,8 @@ const {
 	TMI_CHANNEL: joinChannels,
 	MOD_ACTION,
 	BAN_REASON: banReason = 'Anti-art moderation bot',
-	TIMEOUT_SECONDS: timeoutSeconds
+	TIMEOUT_SECONDS: timeoutSeconds,
+	SAFE_LEVEL = 'sub'
 } = process.env;
 
 let envIsGood = false;
@@ -55,8 +56,6 @@ const regexFlags = '';
 
 const regex = new RegExp(regexText, regexFlags);
 
-console.log({ regex });
-
 const modAction = {
 	ban,
 	b: ban,
@@ -69,6 +68,24 @@ const modAction = {
 	delete: deletemessage,
 	d: deletemessage
 }[MOD_ACTION.toLowerCase()] || deletemessage;
+
+/** @type {'moderator' | 'subscriber' | 'vip'} */
+const safeLevel = {
+	moderator: 'moderator',
+	mod: 'moderator',
+	m: 'moderator',
+
+	subscriber: 'subscriber',
+	sub: 'subscriber',
+	s: 'subscriber',
+
+	vip: 'vip',
+	v: 'vip',
+
+	// TODO: Followers?
+}[SAFE_LEVEL.toLowerCase()] || 'subscriber';
+
+console.log({ username, regex, modAction, safeLevel, timeoutSeconds });
 
 /** @type {tmi.Client} */
 const client = new tmi.Client({
@@ -85,7 +102,7 @@ client.on('message', (channel, tags, message, self) => {
 		return;
 	}
 	const badges = tags.badges || {};
-	if(badges.moderator || badges.broadcaster) {
+	if(isSafe(badges)) {
 		return;
 	}
 	const hasBadText = regex.test(message);
@@ -93,6 +110,35 @@ client.on('message', (channel, tags, message, self) => {
 		modAction(channel, tags);
 	}
 });
+
+function isSafe(badges) {
+	// Moderators and broadcaster are always safe
+	if(badges.moderator || badges.broadcaster) {
+		return true;
+	}
+	switch(safeLevel) {
+		// No one is safe
+		case 'moderator': {
+			break;
+		}
+		// Only subscribers are safe
+		case 'subscriber': {
+			if(badges.subscriber) {
+				return true;
+			}
+			break;
+		}
+		// VIP and subscribers are safe
+		case 'vip': {
+			if(badges.vip || badges.subscriber) {
+				return true;
+			}
+			break;
+		}
+		// TODO: Followers?
+	}
+	return false;
+}
 
 function logModAction(action, channel, username) {
 	console.log(`\u001b[31m${action} bad message\u001b[0m`);

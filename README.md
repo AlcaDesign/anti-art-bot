@@ -42,6 +42,13 @@ $ npm start
 - **`TIMEOUT_SECONDS`**:
 	Number of seconds to use in the timeout. Used if `MOD_ACTION` is `timeout`.
 
+- **`SAFE_LEVEL`**:
+	Lowest level of safety as a filter. Moderators and broadcaster are always
+	ignored. One of `vip`, `subscriber`, `moderator` (lowest to highest).
+	Defaults to `subscriber`. If you choose `subscriber` then VIPs will still
+	be moderated by this bot. If you choose `moderator` then VIPs and
+	subscribers will still be moderated by this bot.
+
 ### .env file
 
 A `.env` file can automatically be loaded by using `npm start`. You can copy the
